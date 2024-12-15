@@ -1,0 +1,47 @@
+# Función para leer los números desde el archivo
+leer_numeros <- function(archivo) {
+  # Verificar si el archivo existe
+  if (!file.exists(archivo)) {
+    stop("El archivo no existe.")
+  }
+  # Leer los datos y convertirlos en un vector de enteros
+  numeros <- as.integer(readLines(archivo))
+  return(numeros)
+}
+
+# Función principal para procesar los números
+procesar_numeros <- function() {
+  # Leer los números desde el archivo
+  numeros <- leer_numeros("numeros.txt")
+  
+  # Calcular la media, mediana y desviación estándar
+  media <- mean(numeros)
+  mediana <- median(numeros)
+  desviacion_estandar <- sd(numeros)
+  
+  # Verificar si la desviación estándar es mayor a 10
+  if (desviacion_estandar > 10) {
+    mensaje_variabilidad <- "Alta variabilidad en los datos."
+  } else {
+    mensaje_variabilidad <- "Variabilidad normal en los datos."
+  }
+  
+  # Usar sapply para calcular el cuadrado de cada número
+  cuadrados <- sapply(numeros, function(x) x^2)
+  
+  # Guardar los resultados en el archivo de salida
+  resultado <- c(
+    paste("Media:", media),
+    paste("Mediana:", mediana),
+    paste("Desviación estándar:", desviacion_estandar),
+    mensaje_variabilidad,
+    "Cuadrados de los números:",
+    paste(cuadrados, collapse = ", ")
+  )
+  
+  # Escribir los resultados en un archivo resultados.txt
+  writeLines(resultado, "resultados.txt")
+}
+
+# Ejecutar el proceso
+procesar_numeros()

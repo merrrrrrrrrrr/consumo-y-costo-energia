@@ -1,0 +1,57 @@
+# Paso 1: Configuración inicial
+# Vectores
+energia <- c(rep("Renovable", 10), rep("No renovable", 10))  # Tipo de energía
+consumo <- c(10, 15, NA, 12, 20, 18, NA, 25, 30, 22, 5, 7, 8, 12, 10, NA, 18, 24, 15, 20, 23)  # Consumo diario en kWh
+costo_kwh <- c(0.12, 0.08, 0.12, 0.12, 0.08, 0.12, 0.08, 0.12, 0.08, 0.12, 0.12, 0.08, 0.12, 0.12, 0.08, 0.08, 0.12, 0.08, 0.12, 0.12)  # Costo por kWh
+
+# Paso 2: Limpieza de datos
+# Reemplazar valores NA con la mediana de consumo de cada tipo de energía
+for (tipo in unique(energia)) {
+  idx <- which(energia == tipo)
+  mediana_consumo <- median(consumo[idx], na.rm = TRUE)
+  consumo[idx][is.na(consumo[idx])] <- mediana_consumo
+}
+
+# Paso 3: Crear el dataframe
+df_consumo <- data.frame(energia, consumo, costo_kwh)
+
+# Paso 4: Cálculos
+# Crear la columna de costo_total
+df_consumo$costo_total <- df_consumo$consumo * df_consumo$costo_kwh
+
+# Calcular el total de consumo y el costo total por tipo de energía
+total_consumo <- tapply(df_consumo$consumo, df_consumo$energia, sum)
+total_costo <- tapply(df_consumo$costo_total, df_consumo$energia, sum)
+
+# Calcular la media del consumo diario por tipo de energía
+media_consumo <- tapply(df_consumo$consumo, df_consumo$energia, mean)
+
+# Agregar la columna de ganancia simulando un aumento del 10%
+df_consumo$ganancia <- df_consumo$costo_total * 1.1
+
+# Paso 5: Resumen
+# Ordenar el dataframe por costo_total en orden descendente
+df_consumo_ordenado <- df_consumo[order(df_consumo$costo_total, decreasing = TRUE), ]
+
+# Calcular el total de consumo y el costo total por tipo de energía
+total_consumo_renovable <- sum(df_consumo$consumo[df_consumo$energia == "Renovable"])
+total_costo_renovable <- sum(df_consumo$costo_total[df_consumo$energia == "Renovable"])
+
+total_consumo_no_renovable <- sum(df_consumo$consumo[df_consumo$energia == "No renovable"])
+total_costo_no_renovable <- sum(df_consumo$costo_total[df_consumo$energia == "No renovable"])
+
+# Extraer las tres filas con mayor costo_total
+top_3_costos <- head(df_consumo_ordenado, 3)
+
+# Mostrar el resumen
+resumen_energia <- list(
+  total_consumo_renovable = total_consumo_renovable,
+  total_costo_renovable = total_costo_renovable,
+  total_consumo_no_renovable = total_consumo_no_renovable,
+  total_costo_no_renovable = total_costo_no_renovable,
+  top_3_costos = top_3_costos
+)
+
+# Mostrar el resumen
+print(resumen_energia)
+
